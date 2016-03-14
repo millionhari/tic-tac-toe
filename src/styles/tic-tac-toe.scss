@@ -1,0 +1,8 @@
+.grid {
+  $size: 200px;
+  .tick {
+    border: 1px solid black;
+    width: $size;
+    height: $size;
+  }
+}
