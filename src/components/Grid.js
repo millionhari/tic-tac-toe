@@ -21,7 +21,9 @@ class Grid extends React.Component {
       {type: 'CHECK_DIAGONAL_LEFT', tick: state.lastTick.tick}
     ];
     let win = actions.reduce(reducer, state);
-    console.log(win);
+    if (win === true){
+      console.log(`${state.lastTick.tick} wins!`);
+    }
   }
 
   _stringToArrayOfInt(coordinates) {

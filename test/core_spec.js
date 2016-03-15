@@ -32,7 +32,7 @@ describe('application logic', () => {
   describe('add tick', () => {
     it('should add x,y ticks to the board', () => {
       const state = createBoard(3);
-      const nextState = addTick(state, [0,0,'x']);
+      const nextState = addTick(state, [0,0]);
       expect(nextState).to.be.like(
        {
           board:{
@@ -53,74 +53,86 @@ describe('application logic', () => {
   describe('check to see if player won', () => {
     it('should check to see if column won', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [0,1,'x']);
-      const nextState2 = addTick(state, [1,1,'x']);
-      const nextState3 = addTick(state, [2,1,'x']);
-      const win = checkColumn(nextState3, 1, 'x');
+      const nextStateX1 = addTick(state, [0,1]);
+      const nextStateO1 = addTick(state, [0,0]);
+      const nextStateX2 = addTick(state, [1,1]);
+      const nextStateO2 = addTick(state, [0,2]);
+      const nextStateX3 = addTick(state, [2,1]);
+      const win = checkColumn(nextStateX3, 1, 'x');
       expect(win).to.equal(true);
     });
 
     it('should check to see if column did not win', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [0,0,'x']);
-      const nextState2 = addTick(state, [1,1,'x']);
-      const nextState3 = addTick(state, [2,1,'x']);
-      const win = checkColumn(nextState3, 1, 'x');
-      expect(win).to.equal(nextState3);
+      const nextStateX1 = addTick(state, [0,0]);
+      const nextStateO1 = addTick(state, [1,0]);
+      const nextStateX2 = addTick(state, [1,1]);
+      const nextStateO2 = addTick(state, [2,0]);
+      const nextStateX3 = addTick(state, [2,1]);
+      const win = checkColumn(nextStateX3, 1, 'x');
+      expect(win).to.equal(nextStateX3);
     });
 
     it('should check to see if row won', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [0,0,'x']);
-      const nextState2 = addTick(state, [0,1,'x']);
-      const nextState3 = addTick(state, [0,2,'x']);
-      const win = checkRow(nextState3, 0, 'x');
+      const nextStateX1 = addTick(state, [0,0]);
+      const nextStateO1 = addTick(state, [1,0]);
+      const nextStateX2 = addTick(state, [0,1]);
+      const nextStateO2 = addTick(state, [2,0]);
+      const nextStateX3 = addTick(state, [0,2]);
+      const win = checkRow(nextStateX3, 0, 'x');
       expect(win).to.equal(true);
     });
 
     it('should check to see if row did not win', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [1,0,'x']);
-      const nextState2 = addTick(state, [0,1,'x']);
-      const nextState3 = addTick(state, [0,2,'x']);
-      const win = checkRow(nextState3, 0, 'x');
-      expect(win).to.equal(nextState3);
+      const nextStateX1 = addTick(state, [1,0]);
+      const nextStateO1 = addTick(state, [0,0]);
+      const nextStateX2 = addTick(state, [0,1]);
+      const nextStateO2 = addTick(state, [2,0]);
+      const nextStateX3 = addTick(state, [0,2]);
+      const win = checkRow(nextStateX3, 0, 'x');
+      expect(win).to.equal(nextStateX3);
     });
 
     it('should check to see if diagonal right won', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [0,0,'x']);
-      const nextState2 = addTick(state, [1,1,'x']);
-      const nextState3 = addTick(state, [2,2,'x']);
-      const win = checkDiagonalRight(nextState3, 'x');
+      const nextStateX1 = addTick(state, [0,0]);
+      const nextStateO1 = addTick(state, [1,0]);
+      const nextStateX2 = addTick(state, [1,1]);
+      const nextStateO2 = addTick(state, [2,0]);
+      const nextStateX3 = addTick(state, [2,2]);
+      const win = checkDiagonalRight(nextStateX3, 'x');
       expect(win).to.equal(true);
     });
 
     it('should check to see if diagonal right did not win', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [1,0,'x']);
-      const nextState2 = addTick(state, [1,1,'x']);
-      const nextState3 = addTick(state, [2,2,'x']);
-      const win = checkDiagonalRight(nextState3, 'x');
-      expect(win).to.equal(nextState3);
+      const nextStateX1 = addTick(state, [1,0]);
+      const nextStateX2 = addTick(state, [1,1]);
+      const nextStateX3 = addTick(state, [2,2]);
+      const win = checkDiagonalRight(nextStateX3, 'x');
+      expect(win).to.equal(nextStateX3);
     });
 
     it('should check to see if diagonal left won', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [0,2,'x']);
-      const nextState2 = addTick(state, [1,1,'x']);
-      const nextState3 = addTick(state, [2,0,'x']);
-      const win = checkDiagonalLeft(nextState3, 'x');
+      const nextStateX1 = addTick(state, [0,2]);
+      const nextStateO1 = addTick(state, [1,0]);
+      const nextStateX2 = addTick(state, [1,1]);
+      const nextStateO2 = addTick(state, [0,0]);
+      const nextStateX3 = addTick(state, [2,0]);
+      const win = checkDiagonalLeft(nextStateX3, 'x');
       expect(win).to.equal(true);
     });
 
     it('should check to see if diagonal left did not win', () => {
       const state = createBoard(3);
-      const nextState1 = addTick(state, [0,0,'x']);
-      const nextState2 = addTick(state, [1,1,'x']);
-      const nextState3 = addTick(state, [2,0,'x']);
-      const win = checkDiagonalLeft(nextState3, 'x');
-      expect(win).to.equal(nextState3);
+      const nextStateX1 = addTick(state, [0,0]);
+      const nextStateX2 = addTick(state, [1,1]);
+      const nextStateX3 = addTick(state, [2,0]);
+      const win = checkDiagonalLeft(nextStateX3, 'x');
+      expect(win).to.equal(nextStateX3);
     });
   });
 

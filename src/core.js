@@ -1,11 +1,22 @@
+// TODO: ALTERNATE BETWEEN X AND O in add tick
+
+function alternateTicks(tick){
+  if (tick === 'x'){
+    return 'o';
+  } else {
+    return 'x';
+  }
+}
+
 export function addTick(state, input){
   if (state.board[input[0]][input[1]] === undefined){
     const newState = state;
-    newState.board[input[0]][input[1]] = input[2];
+    let tick = alternateTicks(state.lastTick.tick);
+    newState.board[input[0]][input[1]] = tick;
     newState.lastTick = {
       yAxis: input[0],
       xAxis: input[1],
-      tick: input[2]
+      tick: tick
     };
     return newState;
   } else {
@@ -88,5 +99,3 @@ export function checkDiagonalLeft(state, tick) {
     return true;
   }
 }
-
-export const INITIAL_STATE = createBoard(3);

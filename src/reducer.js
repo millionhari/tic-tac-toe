@@ -3,10 +3,10 @@ import {addTick,
         checkColumn,
         checkRow,
         checkDiagonalRight,
-        checkDiagonalLeft,
-        INITIAL_STATE} from './core';
+        checkDiagonalLeft
+      } from './core';
 
-export default function reducer(state = INITIAL_STATE, action){
+export default function reducer(state, action){
   switch (action.type) {
     case 'CREATE_BOARD':
       return createBoard(action.size);
