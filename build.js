@@ -60,7 +60,7 @@
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	__webpack_require__(160);
+	__webpack_require__(162);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19708,7 +19708,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reducer = __webpack_require__(164);
+	var _reducer = __webpack_require__(160);
 
 	var _reducer2 = _interopRequireDefault(_reducer);
 
@@ -19723,10 +19723,16 @@
 	var Grid = function (_React$Component) {
 	  _inherits(Grid, _React$Component);
 
-	  function Grid() {
+	  function Grid(props) {
 	    _classCallCheck(this, Grid);
 
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Grid).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Grid).call(this, props));
+
+	    _this.state = {
+	      board: _this.createBoardData(3),
+	      lastTick: null
+	    };
+	    return _this;
 	  }
 
 	  _createClass(Grid, [{
@@ -19739,17 +19745,31 @@
 	      return state;
 	    }
 	  }, {
-	    key: '_reactIdToArray',
-	    value: function _reactIdToArray(reactId) {
-	      return reactId.slice(-3).split(',').map(function (coordinate) {
-	        return parseInt(coordinate);
+	    key: 'componentWillUpdate',
+	    value: function componentWillUpdate(prevProps, state) {
+	      // TODO: CHANGE CORE FUNCTIONS TO RETURN BOARD AND NOT BOOLEAN
+	      var actions = [{ type: 'CHECK_COLUMN', column: state.board.xAxis, tick: state.lastTick }, { type: 'CHECK_ROW', row: state.board.yAxis, tick: state.lastTick }, { type: 'CHECK_DIAGONAL_RIGHT', tick: 'x' }, { type: 'CHECK_DIAGONAL_LEFT', tick: 'x' }];
+	      var win = actions.reduce(_reducer2.default, state);
+	      console.log(state);
+	      console.log('win ' + win);
+	    }
+	  }, {
+	    key: '_stringToArrayOfInt',
+	    value: function _stringToArrayOfInt(coordinates) {
+	      return coordinates.split(',').map(function (tickPoints) {
+	        return parseInt(tickPoints);
 	      });
 	    }
 	  }, {
 	    key: 'tickBox',
-	    value: function tickBox(event) {
-	      var tick = this._reactIdToArray(event.target.getAttribute('data-reactid'));
-	      console.log(tick);
+	    value: function tickBox(state, event) {
+	      var clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
+	      var tick = 'x';
+	      var xAxis = clickedBox[0];
+	      var yAxis = clickedBox[1];
+
+	      var addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
+	      this.setState({ board: (0, _reducer2.default)(state, addTickAction), lastTick: { xAxis: xAxis, yAxis: yAxis, tick: tick } });
 	    }
 	  }, {
 	    key: 'createBoardComponents',
@@ -19765,7 +19785,7 @@
 	            'td',
 	            { key: [column, row],
 	              'data-key': [column, row],
-	              onClick: _this2.tickBox.bind(_this2),
+	              onClick: _this2.tickBox.bind(_this2, board),
 	              className: 'tick' },
 	            (row, column)
 	          );
@@ -19795,11 +19815,10 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var state = this.createBoardData(3);
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'grid' },
-	        this.createBoardComponents(state)
+	        this.createBoardComponents(this.state.board)
 	      );
 	    }
 	  }]);
@@ -19813,13 +19832,130 @@
 /* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = reducer;
+
+	var _core = __webpack_require__(161);
+
+	function reducer() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? _core.INITIAL_STATE : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action.type) {
+	    case 'CREATE_BOARD':
+	      return (0, _core.createBoard)(action.size);
+	    case 'ADD_TICK':
+	      return (0, _core.addTick)(state, action.tick);
+	    case 'CHECK_COLUMN':
+	      return (0, _core.checkColumn)(state, action.column, action.tick);
+	    case 'CHECK_ROW':
+	      return (0, _core.checkRow)(state, action.row, action.tick);
+	    case 'CHECK_DIAGONAL_RIGHT':
+	      return (0, _core.checkDiagonalRight)(state, action.tick);
+	    case 'CHECK_DIAGONAL_LEFT':
+	      return (0, _core.checkDiagonalLeft)(state, action.tick);
+	  }
+	  return state;
+	}
+
+/***/ },
+/* 161 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.addTick = addTick;
+	exports.createBoard = createBoard;
+	exports.checkColumn = checkColumn;
+	exports.checkRow = checkRow;
+	exports.checkDiagonalRight = checkDiagonalRight;
+	exports.checkDiagonalLeft = checkDiagonalLeft;
+	function addTick(state, input) {
+	  var newState = state;
+	  newState[input[1]][input[0]] = input[2];
+	  return newState;
+	}
+
+	function createBoard(n) {
+	  var board = {};
+	  for (var i = 0; i < n; i++) {
+	    var row = [];
+	    for (var j = 0; j < n; j++) {
+	      row.push(undefined);
+	    }
+	    board[i] = row;
+	  }
+	  return board;
+	}
+
+	function checkColumn(state, column, tick) {
+	  var flag = true;
+	  if (flag) {
+	    for (var i in state) {
+	      if (state[i][column] !== tick) {
+	        return false;
+	      }
+	    }
+	  }
+	  return flag;
+	}
+
+	function checkRow(state, row, tick) {
+	  var flag = true;
+	  if (flag) {
+	    for (var i = 0; i < state[row]; i++) {
+	      if (state[row][i] !== tick) {
+	        return false;
+	      }
+	    }
+	  }
+	  return flag;
+	}
+
+	function checkDiagonalRight(state, tick) {
+	  var flag = true;
+	  var position = 0;
+	  for (var i in state) {
+	    if (state[i][position] !== tick) {
+	      return false;
+	    }
+	    position++;
+	  }
+	  return flag;
+	}
+
+	function checkDiagonalLeft(state, tick) {
+	  var flag = true;
+	  var position = state[0].length - 1;
+	  for (var i in state) {
+	    if (state[i][position] !== tick) {
+	      return false;
+	    }
+	    position--;
+	  }
+	  return flag;
+	}
+
+	var INITIAL_STATE = exports.INITIAL_STATE = createBoard(3);
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(161);
+	var content = __webpack_require__(163);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(163)(content, {});
+	var update = __webpack_require__(165)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -19836,10 +19972,10 @@
 	}
 
 /***/ },
-/* 161 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(162)();
+	exports = module.exports = __webpack_require__(164)();
 	// imports
 
 
@@ -19850,7 +19986,7 @@
 
 
 /***/ },
-/* 162 */
+/* 164 */
 /***/ function(module, exports) {
 
 	/*
@@ -19906,7 +20042,7 @@
 
 
 /***/ },
-/* 163 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -20158,123 +20294,6 @@
 			URL.revokeObjectURL(oldSrc);
 	}
 
-
-/***/ },
-/* 164 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = reducer;
-
-	var _core = __webpack_require__(165);
-
-	function reducer() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? _core.INITIAL_STATE : arguments[0];
-	  var action = arguments[1];
-
-	  switch (action.type) {
-	    case 'CREATE_BOARD':
-	      return (0, _core.createBoard)(action.size);
-	    case 'ADD_TICK':
-	      return (0, _core.addTick)(state, action.tick);
-	    case 'CHECK_COLUMN':
-	      return (0, _core.checkColumn)(state, action.column, action.tick);
-	    case 'CHECK_ROW':
-	      return (0, _core.checkRow)(state, action.row, action.tick);
-	    case 'CHECK_DIAGONAL_RIGHT':
-	      return (0, _core.checkDiagonalRight)(state, action.tick);
-	    case 'CHECK_DIAGONAL_LEFT':
-	      return (0, _core.checkDiagonalLeft)(state, action.tick);
-	  }
-	  return state;
-	}
-
-/***/ },
-/* 165 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.addTick = addTick;
-	exports.createBoard = createBoard;
-	exports.checkColumn = checkColumn;
-	exports.checkRow = checkRow;
-	exports.checkDiagonalRight = checkDiagonalRight;
-	exports.checkDiagonalLeft = checkDiagonalLeft;
-	function addTick(state, input) {
-	  var newState = state;
-	  newState[input[1]][input[0]] = input[2];
-	  return newState;
-	}
-
-	function createBoard(n) {
-	  var board = {};
-	  for (var i = 0; i < n; i++) {
-	    var row = [];
-	    for (var j = 0; j < n; j++) {
-	      row.push(undefined);
-	    }
-	    board[i] = row;
-	  }
-	  return board;
-	}
-
-	function checkColumn(state, column, tick) {
-	  var flag = true;
-	  if (flag) {
-	    for (var i in state) {
-	      if (state[i][column] !== tick) {
-	        return false;
-	      }
-	    }
-	  }
-	  return flag;
-	}
-
-	function checkRow(state, row, tick) {
-	  var flag = true;
-	  if (flag) {
-	    for (var i = 0; i < state[row].length; i++) {
-	      if (state[row][i] !== tick) {
-	        return false;
-	      }
-	    }
-	  }
-	  return flag;
-	}
-
-	function checkDiagonalRight(state, tick) {
-	  var flag = true;
-	  var position = 0;
-	  for (var i in state) {
-	    if (state[i][position] !== tick) {
-	      return false;
-	    }
-	    position++;
-	  }
-	  return flag;
-	}
-
-	function checkDiagonalLeft(state, tick) {
-	  var flag = true;
-	  var position = state[0].length - 1;
-	  for (var i in state) {
-	    if (state[i][position] !== tick) {
-	      return false;
-	    }
-	    position--;
-	  }
-	  return flag;
-	}
-
-	var INITIAL_STATE = exports.INITIAL_STATE = createBoard(3);
 
 /***/ }
 /******/ ]);

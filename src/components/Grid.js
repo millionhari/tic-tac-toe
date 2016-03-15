@@ -4,20 +4,24 @@ import reducer from '../reducer';
 class Grid extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      board: this.createBoardData(3)
-    };
+    this.state = this.createBoardData(3);
   }
   createBoardData(size) {
     let initialState = {};
     let action = {type: 'CREATE_BOARD', size: size};
-    // let state = actions.reduce(reducer, initialState);
     let state = reducer(initialState, action);
     return state;
   }
 
-  componentDidUpdate(prevProps, state) {
-    console.log(state.board);
+  componentWillUpdate(prevProps, state) {
+    let actions = [
+      {type: 'CHECK_COLUMN', column:state.lastTick.xAxis, tick: state.lastTick.tick},
+      {type: 'CHECK_ROW', row:state.lastTick.yAxis, tick: state.lastTick.tick},
+      {type: 'CHECK_DIAGONAL_RIGHT', tick: state.lastTick.tick},
+      {type: 'CHECK_DIAGONAL_LEFT', tick: state.lastTick.tick}
+    ];
+    let win = actions.reduce(reducer, state);
+    console.log(win);
   }
 
   _stringToArrayOfInt(coordinates) {
@@ -28,18 +32,19 @@ class Grid extends React.Component {
     let clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
     let [tick, xAxis, yAxis] = ['x', clickedBox[0], clickedBox[1]];
     const addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
-    this.setState({board: reducer(state, addTickAction)});
+    const nextState = reducer(state, addTickAction);
+    this.setState(nextState);
   }
 
-  createBoardComponents(board) {
+  createBoardComponents(state) {
     let rowNode = [];
     let boardNode = [];
-    for (let row in board){
-      rowNode.push(board[row].map((tick, column) =>
-        <td key={[column, row]}
-        data-key={[column, row]}
-        onClick={this.tickBox.bind(this, board)}
-        className='tick'>{row, column}</td>
+    for (let row in state.board){
+      rowNode.push(state.board[row].map((tick, column) =>
+        <td key={[row, column]}
+        data-key={[row, column]}
+        onClick={this.tickBox.bind(this, state)}
+        className='tick'>{tick}</td>
       ));
     }
     rowNode.forEach((row, index) => boardNode.push(<tr key={index}>{row}</tr>));
@@ -49,7 +54,7 @@ class Grid extends React.Component {
   render() {
     return (
       <div className='grid'>
-          {this.createBoardComponents(this.state.board)}
+          {this.createBoardComponents(this.state)}
       </div>
     );
   }
