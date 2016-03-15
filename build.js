@@ -56,11 +56,11 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _Grid = __webpack_require__(165);
+	var _Grid = __webpack_require__(159);
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	__webpack_require__(161);
+	__webpack_require__(160);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19701,125 +19701,125 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = reducer;
 
-	var _core = __webpack_require__(160);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	function reducer() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? _core.INITIAL_STATE : arguments[0];
-	  var action = arguments[1];
+	var _react = __webpack_require__(1);
 
-	  switch (action.type) {
-	    case 'CREATE_BOARD':
-	      return (0, _core.createBoard)(action.size);
-	    case 'ADD_TICK':
-	      return (0, _core.addTick)(state, action.tick);
-	    case 'CHECK_COLUMN':
-	      return (0, _core.checkColumn)(state, action.column, action.tick);
-	    case 'CHECK_ROW':
-	      return (0, _core.checkRow)(state, action.row, action.tick);
-	    case 'CHECK_DIAGONAL_RIGHT':
-	      return (0, _core.checkDiagonalRight)(state, action.tick);
-	    case 'CHECK_DIAGONAL_LEFT':
-	      return (0, _core.checkDiagonalLeft)(state, action.tick);
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reducer = __webpack_require__(164);
+
+	var _reducer2 = _interopRequireDefault(_reducer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Grid = function (_React$Component) {
+	  _inherits(Grid, _React$Component);
+
+	  function Grid() {
+	    _classCallCheck(this, Grid);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Grid).apply(this, arguments));
 	  }
-	  return state;
-	}
+
+	  _createClass(Grid, [{
+	    key: 'createBoardData',
+	    value: function createBoardData(size) {
+	      var initialState = {};
+	      var action = { type: 'CREATE_BOARD', size: size };
+	      // let state = actions.reduce(reducer, initialState);
+	      var state = (0, _reducer2.default)(initialState, action);
+	      return state;
+	    }
+	  }, {
+	    key: '_reactIdToArray',
+	    value: function _reactIdToArray(reactId) {
+	      return reactId.slice(-3).split(',').map(function (coordinate) {
+	        return parseInt(coordinate);
+	      });
+	    }
+	  }, {
+	    key: 'tickBox',
+	    value: function tickBox(event) {
+	      var tick = this._reactIdToArray(event.target.getAttribute('data-reactid'));
+	      console.log(tick);
+	    }
+	  }, {
+	    key: 'createBoardComponents',
+	    value: function createBoardComponents(board) {
+	      var _this2 = this;
+
+	      var rowNode = [];
+	      var boardNode = [];
+
+	      var _loop = function _loop(row) {
+	        rowNode.push(board[row].map(function (tick, column) {
+	          return _react2.default.createElement(
+	            'td',
+	            { key: [column, row],
+	              'data-key': [column, row],
+	              onClick: _this2.tickBox.bind(_this2),
+	              className: 'tick' },
+	            (row, column)
+	          );
+	        }));
+	      };
+
+	      for (var row in board) {
+	        _loop(row);
+	      }
+	      rowNode.forEach(function (row, index) {
+	        return boardNode.push(_react2.default.createElement(
+	          'tr',
+	          { key: index },
+	          row
+	        ));
+	      });
+	      return _react2.default.createElement(
+	        'table',
+	        null,
+	        _react2.default.createElement(
+	          'tbody',
+	          null,
+	          boardNode
+	        )
+	      );
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var state = this.createBoardData(3);
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'grid' },
+	        this.createBoardComponents(state)
+	      );
+	    }
+	  }]);
+
+	  return Grid;
+	}(_react2.default.Component);
+
+	exports.default = Grid;
 
 /***/ },
 /* 160 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.addTick = addTick;
-	exports.createBoard = createBoard;
-	exports.checkColumn = checkColumn;
-	exports.checkRow = checkRow;
-	exports.checkDiagonalRight = checkDiagonalRight;
-	exports.checkDiagonalLeft = checkDiagonalLeft;
-	function addTick(state, input) {
-	  var newState = state;
-	  newState[input[1]][input[0]] = input[2];
-	  return newState;
-	}
-
-	function createBoard(n) {
-	  var board = {};
-	  for (var i = 0; i < n; i++) {
-	    var row = [];
-	    for (var j = 0; j < n; j++) {
-	      row.push(undefined);
-	    }
-	    board[i] = row;
-	  }
-	  return board;
-	}
-
-	function checkColumn(state, column, tick) {
-	  var flag = true;
-	  if (flag) {
-	    for (var i in state) {
-	      if (state[i][column] !== tick) {
-	        return false;
-	      }
-	    }
-	  }
-	  return flag;
-	}
-
-	function checkRow(state, row, tick) {
-	  var flag = true;
-	  if (flag) {
-	    for (var i = 0; i < state[row].length; i++) {
-	      if (state[row][i] !== tick) {
-	        return false;
-	      }
-	    }
-	  }
-	  return flag;
-	}
-
-	function checkDiagonalRight(state, tick) {
-	  var flag = true;
-	  var position = 0;
-	  for (var i in state) {
-	    if (state[i][position] !== tick) {
-	      return false;
-	    }
-	    position++;
-	  }
-	  return flag;
-	}
-
-	function checkDiagonalLeft(state, tick) {
-	  var flag = true;
-	  var position = state[0].length - 1;
-	  for (var i in state) {
-	    if (state[i][position] !== tick) {
-	      return false;
-	    }
-	    position--;
-	  }
-	  return flag;
-	}
-
-	var INITIAL_STATE = exports.INITIAL_STATE = createBoard(3);
-
-/***/ },
-/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(162);
+	var content = __webpack_require__(161);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(164)(content, {});
+	var update = __webpack_require__(163)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -19836,10 +19836,10 @@
 	}
 
 /***/ },
-/* 162 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(163)();
+	exports = module.exports = __webpack_require__(162)();
 	// imports
 
 
@@ -19850,7 +19850,7 @@
 
 
 /***/ },
-/* 163 */
+/* 162 */
 /***/ function(module, exports) {
 
 	/*
@@ -19906,7 +19906,7 @@
 
 
 /***/ },
-/* 164 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -20160,7 +20160,7 @@
 
 
 /***/ },
-/* 165 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20168,111 +20168,113 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.default = reducer;
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _core = __webpack_require__(165);
 
-	var _react = __webpack_require__(1);
+	function reducer() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? _core.INITIAL_STATE : arguments[0];
+	  var action = arguments[1];
 
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reducer = __webpack_require__(159);
-
-	var _reducer2 = _interopRequireDefault(_reducer);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Grid = function (_React$Component) {
-	  _inherits(Grid, _React$Component);
-
-	  function Grid() {
-	    _classCallCheck(this, Grid);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Grid).apply(this, arguments));
+	  switch (action.type) {
+	    case 'CREATE_BOARD':
+	      return (0, _core.createBoard)(action.size);
+	    case 'ADD_TICK':
+	      return (0, _core.addTick)(state, action.tick);
+	    case 'CHECK_COLUMN':
+	      return (0, _core.checkColumn)(state, action.column, action.tick);
+	    case 'CHECK_ROW':
+	      return (0, _core.checkRow)(state, action.row, action.tick);
+	    case 'CHECK_DIAGONAL_RIGHT':
+	      return (0, _core.checkDiagonalRight)(state, action.tick);
+	    case 'CHECK_DIAGONAL_LEFT':
+	      return (0, _core.checkDiagonalLeft)(state, action.tick);
 	  }
+	  return state;
+	}
 
-	  _createClass(Grid, [{
-	    key: 'createBoardData',
-	    value: function createBoardData(size) {
-	      var initialState = {};
-	      var action = { type: 'CREATE_BOARD', size: size };
-	      // let state = actions.reduce(reducer, initialState);
-	      var state = (0, _reducer2.default)(initialState, action);
-	      return state;
+/***/ },
+/* 165 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.addTick = addTick;
+	exports.createBoard = createBoard;
+	exports.checkColumn = checkColumn;
+	exports.checkRow = checkRow;
+	exports.checkDiagonalRight = checkDiagonalRight;
+	exports.checkDiagonalLeft = checkDiagonalLeft;
+	function addTick(state, input) {
+	  var newState = state;
+	  newState[input[1]][input[0]] = input[2];
+	  return newState;
+	}
+
+	function createBoard(n) {
+	  var board = {};
+	  for (var i = 0; i < n; i++) {
+	    var row = [];
+	    for (var j = 0; j < n; j++) {
+	      row.push(undefined);
 	    }
-	  }, {
-	    key: 'tickBox',
-	    value: function tickBox(event) {
-	      console.log(event.target);
-	    }
-	  }, {
-	    key: 'createBoardComponents',
-	    value: function createBoardComponents(board) {
-	      var _this2 = this;
+	    board[i] = row;
+	  }
+	  return board;
+	}
 
-	      var rowArr = [];
-	      var boardArr = [];
-
-	      var _loop = function _loop(row) {
-	        rowArr.push(board[row].map(function (tick, column) {
-	          return _react2.default.createElement(
-	            'td',
-	            { key: [row, column],
-	              'data-key': [row, column],
-	              onClick: _this2.tickBox.bind(_this2),
-	              className: 'tick' },
-	            (row, column)
-	          );
-	        }));
-	      };
-
-	      for (var row in board) {
-	        _loop(row);
+	function checkColumn(state, column, tick) {
+	  var flag = true;
+	  if (flag) {
+	    for (var i in state) {
+	      if (state[i][column] !== tick) {
+	        return false;
 	      }
-	      rowArr.forEach(function (row, index) {
-	        return boardArr.push(_react2.default.createElement(
-	          'tr',
-	          { key: index },
-	          row
-	        ));
-	      });
-	      console.log(boardArr);
-	      return _react2.default.createElement(
-	        'table',
-	        null,
-	        _react2.default.createElement(
-	          'tbody',
-	          null,
-	          boardArr
-	        )
-	      );
 	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var board = this.createBoardData(3);
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'grid' },
-	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          'Tic Tac Toe'
-	        ),
-	        this.createBoardComponents(board)
-	      );
+	  }
+	  return flag;
+	}
+
+	function checkRow(state, row, tick) {
+	  var flag = true;
+	  if (flag) {
+	    for (var i = 0; i < state[row].length; i++) {
+	      if (state[row][i] !== tick) {
+	        return false;
+	      }
 	    }
-	  }]);
+	  }
+	  return flag;
+	}
 
-	  return Grid;
-	}(_react2.default.Component);
+	function checkDiagonalRight(state, tick) {
+	  var flag = true;
+	  var position = 0;
+	  for (var i in state) {
+	    if (state[i][position] !== tick) {
+	      return false;
+	    }
+	    position++;
+	  }
+	  return flag;
+	}
 
-	exports.default = Grid;
+	function checkDiagonalLeft(state, tick) {
+	  var flag = true;
+	  var position = state[0].length - 1;
+	  for (var i in state) {
+	    if (state[i][position] !== tick) {
+	      return false;
+	    }
+	    position--;
+	  }
+	  return flag;
+	}
+
+	var INITIAL_STATE = exports.INITIAL_STATE = createBoard(3);
 
 /***/ }
 /******/ ]);

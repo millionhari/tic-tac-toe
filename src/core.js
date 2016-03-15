@@ -31,7 +31,7 @@ export function checkColumn(state, column, tick){
 export function checkRow(state, row, tick) {
   let flag = true;
   if (flag){
-    for (let i = 0; i < state[row].length; i++){
+    for (let i = 0; i < state[row]; i++){
       if (state[row][i] !== tick){
         return false;
       }

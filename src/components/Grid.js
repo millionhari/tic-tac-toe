@@ -2,40 +2,54 @@ import React from 'react';
 import reducer from '../reducer';
 
 class Grid extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      board: this.createBoardData(3)
+    };
+  }
   createBoardData(size) {
     let initialState = {};
-    let action = {type: 'CREATE_BOARD', size: size}
+    let action = {type: 'CREATE_BOARD', size: size};
     // let state = actions.reduce(reducer, initialState);
     let state = reducer(initialState, action);
     return state;
   }
 
-  tickBox(event) {
-    console.log(event.target);
+  componentDidUpdate(prevProps, state) {
+    console.log(state.board);
+  }
+
+  _stringToArrayOfInt(coordinates) {
+    return coordinates.split(',').map(tickPoints => parseInt(tickPoints));
+  }
+
+  tickBox(state, event) {
+    let clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
+    let [tick, xAxis, yAxis] = ['x', clickedBox[0], clickedBox[1]];
+    const addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
+    this.setState({board: reducer(state, addTickAction)});
   }
 
   createBoardComponents(board) {
-    let rowArr = [];
-    let boardArr = [];
+    let rowNode = [];
+    let boardNode = [];
     for (let row in board){
-      rowArr.push(board[row].map((tick, column) =>
-        <td key={[row, column]}
-        data-key={[row,column]}
-        onClick={this.tickBox.bind(this)}
-        className="tick">{row, column}</td>
+      rowNode.push(board[row].map((tick, column) =>
+        <td key={[column, row]}
+        data-key={[column, row]}
+        onClick={this.tickBox.bind(this, board)}
+        className='tick'>{row, column}</td>
       ));
     }
-    rowArr.forEach((row, index) => boardArr.push(<tr key={index}>{row}</tr>));
-    console.log(boardArr);
-    return <table><tbody>{boardArr}</tbody></table>
+    rowNode.forEach((row, index) => boardNode.push(<tr key={index}>{row}</tr>));
+    return <table><tbody>{boardNode}</tbody></table>
   }
 
   render() {
-    let board = this.createBoardData(3);
     return (
-      <div className="grid">
-        <h1>Tic Tac Toe</h1>
-          {this.createBoardComponents(board)}
+      <div className='grid'>
+          {this.createBoardComponents(this.state.board)}
       </div>
     );
   }
