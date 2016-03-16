@@ -6,7 +6,7 @@ import WinBox from './WinBox';
 class Grid extends React.Component {
   constructor(props) {
     super(props);
-    let nGrid = parseInt(prompt('NxN board do you want to play with?'));
+    let nGrid = parseInt(prompt('Please enter a number for the NxN board do you want to play with'));
     while (isNaN(nGrid)){
       nGrid = parseInt(prompt('Please enter a valid number'));
     }

@@ -1,5 +1,3 @@
-// TODO: ALTERNATE BETWEEN X AND O in add tick
-
 function alternateTicks(tick){
   if (tick === 'x'){
     return 'o';

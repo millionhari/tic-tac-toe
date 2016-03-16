@@ -60,7 +60,7 @@
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	__webpack_require__(163);
+	__webpack_require__(164);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19716,6 +19716,10 @@
 
 	var _TickBox2 = _interopRequireDefault(_TickBox);
 
+	var _WinBox = __webpack_require__(163);
+
+	var _WinBox2 = _interopRequireDefault(_WinBox);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19732,7 +19736,11 @@
 
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Grid).call(this, props));
 
-	    _this.state = _this.createBoardData(5);
+	    var nGrid = parseInt(prompt('Please enter a number for the NxN board do you want to play with'));
+	    while (isNaN(nGrid)) {
+	      nGrid = parseInt(prompt('Please enter a valid number'));
+	    }
+	    _this.state = _this.createBoardData(nGrid);
 	    return _this;
 	  }
 
@@ -19745,17 +19753,28 @@
 	      return state;
 	    }
 	  }, {
-	    key: 'componentWillUpdate',
-	    value: function componentWillUpdate(prevProps, state) {
+	    key: 'restartState',
+	    value: function restartState() {
+	      var freshState = this.createBoardData(this.state.board[0].length);
+	      this.setState(freshState);
+	    }
+	  }, {
+	    key: 'checkWin',
+	    value: function checkWin(state) {
 	      var actions = [{ type: 'CHECK_COLUMN', column: state.lastTick.xAxis, tick: state.lastTick.tick }, { type: 'CHECK_ROW', row: state.lastTick.yAxis, tick: state.lastTick.tick }, { type: 'CHECK_DIAGONAL_RIGHT', tick: state.lastTick.tick }, { type: 'CHECK_DIAGONAL_LEFT', tick: state.lastTick.tick }];
 	      var win = actions.reduce(_reducer2.default, state);
 	      if (win === true) {
-	        state.win = state.lastTick.tick + ' wins!';
+	        state.winner = state.lastTick.tick;
 	        return;
 	      }
 	      if (state.lastTick.numberOfTicks === Math.pow(state.board[0].length, 2)) {
-	        state.win = 'tie';
+	        state.winner = 'TIE';
 	      }
+	    }
+	  }, {
+	    key: 'componentWillUpdate',
+	    value: function componentWillUpdate(prevProps, state) {
+	      this.checkWin(state);
 	    }
 	  }, {
 	    key: '_stringToArrayOfInt',
@@ -19767,14 +19786,16 @@
 	  }, {
 	    key: 'tickBox',
 	    value: function tickBox(state, event) {
-	      var clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
-	      var tick = 'x';
-	      var xAxis = clickedBox[0];
-	      var yAxis = clickedBox[1];
+	      if (!state.winner) {
+	        var clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
+	        var tick = 'x';
+	        var xAxis = clickedBox[0];
+	        var yAxis = clickedBox[1];
 
-	      var addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
-	      var nextState = (0, _reducer2.default)(state, addTickAction);
-	      this.setState(nextState);
+	        var addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
+	        var nextState = (0, _reducer2.default)(state, addTickAction);
+	        this.setState(nextState);
+	      }
 	    }
 	  }, {
 	    key: 'createBoardComponents',
@@ -19822,17 +19843,17 @@
 	    value: function render() {
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'grid-wrapper' },
+	        null,
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'grid' },
+	          { className: 'grid-wrapper' },
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'overlay' },
-	            this.state.win
-	          ),
-	          this.createBoardComponents(this.state)
-	        )
+	            { className: 'grid' },
+	            this.createBoardComponents(this.state)
+	          )
+	        ),
+	        _react2.default.createElement(_WinBox2.default, { restart: this.restartState.bind(this), winner: this.state.winner })
 	      );
 	    }
 	  }]);
@@ -19888,8 +19909,6 @@
 	exports.checkRow = checkRow;
 	exports.checkDiagonalRight = checkDiagonalRight;
 	exports.checkDiagonalLeft = checkDiagonalLeft;
-	// TODO: ALTERNATE BETWEEN X AND O in add tick
-
 	function alternateTicks(tick) {
 	  if (tick === 'x') {
 	    return 'o';
@@ -20045,13 +20064,76 @@
 /* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var WinScreen = function (_React$Component) {
+	  _inherits(WinScreen, _React$Component);
+
+	  function WinScreen(props) {
+	    _classCallCheck(this, WinScreen);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(WinScreen).call(this, props));
+	  }
+
+	  _createClass(WinScreen, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'win-overlay' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'win-overlay-inner' },
+	          _react2.default.createElement(
+	            'h1',
+	            null,
+	            'WINNER: ',
+	            this.props.winner
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'button', onClick: this.props.restart },
+	            'RESTART'
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return WinScreen;
+	}(_react2.default.Component);
+
+	exports.default = WinScreen;
+
+/***/ },
+/* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(164);
+	var content = __webpack_require__(165);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(166)(content, {});
+	var update = __webpack_require__(167)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -20068,21 +20150,21 @@
 	}
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(165)();
+	exports = module.exports = __webpack_require__(166)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "body {\n  background-color: black; }\n\nbody {\n  font-family: 'Quicksand', sans-serif; }\n\n.grid-wrapper .tic-tac-toe-board {\n  width: 700px;\n  margin: 0 auto; }\n\n.grid-wrapper .tick {\n  width: auto;\n  position: relative; }\n\n.grid-wrapper .tick:after {\n  content: '';\n  display: block;\n  margin-top: 100%; }\n\n.grid-wrapper .tick {\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  border: 1px solid black;\n  position: relative; }\n\n.grid-wrapper .inner-tick {\n  margin: auto;\n  position: absolute; }\n", ""]);
+	exports.push([module.id, "body {\n  font-family: 'Quicksand', sans-serif;\n  margin: 0;\n  padding: 0; }\n\n.button {\n  font-size: 15px;\n  border: 0;\n  width: 80px;\n  margin: 0 auto;\n  border-radius: 7px;\n  padding: 10px;\n  background-color: #ff8000;\n  color: white;\n  transition: .25s; }\n  .button:hover {\n    cursor: pointer;\n    background-color: #ff952b;\n    transition: .25s; }\n\n.win-overlay {\n  font-family: 'Montserrat', sans-serif;\n  position: relative;\n  z-index: 10;\n  margin: 0 auto; }\n  .win-overlay .win-overlay-inner {\n    text-align: center;\n    position: relative;\n    font-size: 10px; }\n\n.grid-wrapper .grid {\n  padding-top: 20px; }\n\n.grid-wrapper .tic-tac-toe-board {\n  margin: 0 auto;\n  margin: 0 auto; }\n  @media (min-width: 1442px) {\n    .grid-wrapper .tic-tac-toe-board {\n      width: 1100px; } }\n  @media (min-width: 1069px) and (max-width: 1441px) {\n    .grid-wrapper .tic-tac-toe-board {\n      width: 600px; } }\n  @media (min-width: 736px) and (max-width: 1068px) {\n    .grid-wrapper .tic-tac-toe-board {\n      width: 500px; } }\n  @media (max-width: 735px) {\n    .grid-wrapper .tic-tac-toe-board {\n      width: 70%; } }\n\n.grid-wrapper .tick {\n  width: auto;\n  position: relative;\n  margin: 20px auto; }\n\n.grid-wrapper .tick:after {\n  content: '';\n  display: block;\n  margin-top: 100%; }\n\n.grid-wrapper .tick {\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  border: 0;\n  background-color: #ff8000;\n  border-radius: 20px;\n  position: relative;\n  transition: .25s; }\n  .grid-wrapper .tick:hover {\n    cursor: pointer;\n    background-color: #ff952b;\n    transition: .25s; }\n\n.grid-wrapper .inner-tick {\n  color: white;\n  margin-left: auto;\n  margin-right: auto;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 45%;\n  transform: translateY(-50%);\n  text-align: center;\n  font-weight: bold;\n  font-size: 100px; }\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports) {
 
 	/*
@@ -20138,7 +20220,7 @@
 
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
