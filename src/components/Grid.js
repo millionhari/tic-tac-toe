@@ -6,7 +6,10 @@ import WinBox from './WinBox';
 class Grid extends React.Component {
   constructor(props) {
     super(props);
-    let nGrid = prompt('how many grids?');
+    let nGrid = parseInt(prompt('NxN board do you want to play with?'));
+    while (isNaN(nGrid)){
+      nGrid = parseInt(prompt('Please enter a valid number'));
+    }
     this.state = this.createBoardData(nGrid);
   }
 
@@ -35,7 +38,7 @@ class Grid extends React.Component {
       return;
     }
     if (state.lastTick.numberOfTicks === Math.pow(state.board[0].length,2)){
-      state.winner = 'tie';
+      state.winner = 'TIE';
     }
   }
 
@@ -48,11 +51,13 @@ class Grid extends React.Component {
   }
 
   tickBox(state, event) {
-    const clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
-    const [tick, xAxis, yAxis] = ['x', clickedBox[0], clickedBox[1]];
-    const addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
-    const nextState = reducer(state, addTickAction);
-    this.setState(nextState);
+    if (!state.winner){
+      const clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
+      const [tick, xAxis, yAxis] = ['x', clickedBox[0], clickedBox[1]];
+      const addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
+      const nextState = reducer(state, addTickAction);
+      this.setState(nextState);
+    }
   }
 
   createBoardComponents(state) {

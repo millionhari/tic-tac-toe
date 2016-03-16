@@ -1,7 +1,6 @@
 @import 'grid';
-@import 'animate';
 $eventbrite-orange: #ff8000;
-$eventbrite-orange-hover: #e57300;
+$eventbrite-orange-hover: #ff952b;
 $tick: white;
 
 body {
@@ -18,9 +17,11 @@ body {
   padding: 10px;
   background-color: $eventbrite-orange;
   color: white;
+  transition: .25s;
   &:hover {
     cursor: pointer;
     background-color: $eventbrite-orange-hover;
+    transition: .25s;
   }
 }
 
@@ -75,9 +76,11 @@ body {
     background-color: $eventbrite-orange;
     border-radius: 20px;
     position: relative;
+    transition: .25s;
     &:hover {
       cursor: pointer;
       background-color: $eventbrite-orange-hover;
+      transition: .25s;
     }
   }
 
