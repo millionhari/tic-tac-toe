@@ -1,5 +1,8 @@
 import React from 'react';
 import reducer from '../reducer';
+import TickBox from './TickBox';
+import WinScreen from './WinScreen';
+import TieScreen from './TieScreen';
 
 class Grid extends React.Component {
   constructor(props) {
@@ -7,14 +10,19 @@ class Grid extends React.Component {
     this.state = this.createBoardData(3);
   }
   createBoardData(size) {
-    let initialState = {};
-    let action = {type: 'CREATE_BOARD', size: size};
-    let state = reducer(initialState, action);
+    const initialState = {};
+    const action = {type: 'CREATE_BOARD', size: size};
+    const state = reducer(initialState, action);
     return state;
   }
 
+  restartState() {
+    const freshState = this.createBoardData(3);
+    this.setState(freshState);
+  }
+
   componentWillUpdate(prevProps, state) {
-    let actions = [
+    const actions = [
       {type: 'CHECK_COLUMN', column:state.lastTick.xAxis, tick: state.lastTick.tick},
       {type: 'CHECK_ROW', row:state.lastTick.yAxis, tick: state.lastTick.tick},
       {type: 'CHECK_DIAGONAL_RIGHT', tick: state.lastTick.tick},
@@ -22,7 +30,11 @@ class Grid extends React.Component {
     ];
     let win = actions.reduce(reducer, state);
     if (win === true){
-      console.log(`${state.lastTick.tick} wins!`);
+      state.win = <WinScreen winState={win} winner={state.lastTick.tick} restartState={this.restartState.bind(this)}/>
+      return;
+    }
+    if (state.lastTick.numberOfTicks === Math.pow(state.board[0].length,2)){
+      state.win = <TieScreen restartState={this.restartState.bind(this)}/>
     }
   }
 
@@ -31,8 +43,8 @@ class Grid extends React.Component {
   }
 
   tickBox(state, event) {
-    let clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
-    let [tick, xAxis, yAxis] = ['x', clickedBox[0], clickedBox[1]];
+    const clickedBox = this._stringToArrayOfInt(event.target.getAttribute('data-key'));
+    const [tick, xAxis, yAxis] = ['x', clickedBox[0], clickedBox[1]];
     const addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
     const nextState = reducer(state, addTickAction);
     this.setState(nextState);
@@ -46,17 +58,22 @@ class Grid extends React.Component {
         <td key={[row, column]}
         data-key={[row, column]}
         onClick={this.tickBox.bind(this, state)}
-        className='tick'>{tick}</td>
+        className='tick'><TickBox tick={tick}/></td>
       ));
     }
     rowNode.forEach((row, index) => boardNode.push(<tr key={index}>{row}</tr>));
-    return <table><tbody>{boardNode}</tbody></table>
+    return <table className='tic-tac-toe-board'><tbody>{boardNode}</tbody></table>
   }
 
   render() {
     return (
-      <div className='grid'>
-          {this.createBoardComponents(this.state)}
+      <div>
+        {this.state.win}
+        <div className='grid-wrapper'>
+          <div className='grid'>
+              {this.createBoardComponents(this.state)}
+          </div>
+        </div>
       </div>
     );
   }

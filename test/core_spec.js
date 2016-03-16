@@ -22,7 +22,8 @@ describe('application logic', () => {
           lastTick: {
             tick: undefined,
             yAxis: undefined,
-            xAxis: undefined
+            xAxis: undefined,
+            numberOfTicks: 0
           }
         }
       );
@@ -43,7 +44,8 @@ describe('application logic', () => {
           lastTick: {
             tick: 'x',
             yAxis: 0,
-            xAxis: 0
+            xAxis: 0,
+            numberOfTicks: 1
           }
         }
       );

@@ -20,7 +20,8 @@ describe('reducer', () => {
       lastTick: {
         tick: undefined,
         yAxis: undefined,
-        xAxis: undefined
+        xAxis: undefined,
+        numberOfTicks: 0
       }
     });
   });
@@ -42,7 +43,8 @@ describe('reducer', () => {
       lastTick: {
         tick: 'x',
         yAxis: 1,
-        xAxis: 0
+        xAxis: 0,
+        numberOfTicks: 1
       }
     });
   });

@@ -60,7 +60,7 @@
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	__webpack_require__(162);
+	__webpack_require__(163);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19712,6 +19712,10 @@
 
 	var _reducer2 = _interopRequireDefault(_reducer);
 
+	var _TickBox = __webpack_require__(162);
+
+	var _TickBox2 = _interopRequireDefault(_TickBox);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19728,10 +19732,7 @@
 
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Grid).call(this, props));
 
-	    _this.state = {
-	      board: _this.createBoardData(3),
-	      lastTick: null
-	    };
+	    _this.state = _this.createBoardData(5);
 	    return _this;
 	  }
 
@@ -19740,18 +19741,21 @@
 	    value: function createBoardData(size) {
 	      var initialState = {};
 	      var action = { type: 'CREATE_BOARD', size: size };
-	      // let state = actions.reduce(reducer, initialState);
 	      var state = (0, _reducer2.default)(initialState, action);
 	      return state;
 	    }
 	  }, {
 	    key: 'componentWillUpdate',
 	    value: function componentWillUpdate(prevProps, state) {
-	      // TODO: CHANGE CORE FUNCTIONS TO RETURN BOARD AND NOT BOOLEAN
-	      var actions = [{ type: 'CHECK_COLUMN', column: state.board.xAxis, tick: state.lastTick }, { type: 'CHECK_ROW', row: state.board.yAxis, tick: state.lastTick }, { type: 'CHECK_DIAGONAL_RIGHT', tick: 'x' }, { type: 'CHECK_DIAGONAL_LEFT', tick: 'x' }];
+	      var actions = [{ type: 'CHECK_COLUMN', column: state.lastTick.xAxis, tick: state.lastTick.tick }, { type: 'CHECK_ROW', row: state.lastTick.yAxis, tick: state.lastTick.tick }, { type: 'CHECK_DIAGONAL_RIGHT', tick: state.lastTick.tick }, { type: 'CHECK_DIAGONAL_LEFT', tick: state.lastTick.tick }];
 	      var win = actions.reduce(_reducer2.default, state);
-	      console.log(state);
-	      console.log('win ' + win);
+	      if (win === true) {
+	        state.win = state.lastTick.tick + ' wins!';
+	        return;
+	      }
+	      if (state.lastTick.numberOfTicks === Math.pow(state.board[0].length, 2)) {
+	        state.win = 'tie';
+	      }
 	    }
 	  }, {
 	    key: '_stringToArrayOfInt',
@@ -19769,30 +19773,31 @@
 	      var yAxis = clickedBox[1];
 
 	      var addTickAction = { type: 'ADD_TICK', tick: [xAxis, yAxis, tick] };
-	      this.setState({ board: (0, _reducer2.default)(state, addTickAction), lastTick: { xAxis: xAxis, yAxis: yAxis, tick: tick } });
+	      var nextState = (0, _reducer2.default)(state, addTickAction);
+	      this.setState(nextState);
 	    }
 	  }, {
 	    key: 'createBoardComponents',
-	    value: function createBoardComponents(board) {
+	    value: function createBoardComponents(state) {
 	      var _this2 = this;
 
 	      var rowNode = [];
 	      var boardNode = [];
 
 	      var _loop = function _loop(row) {
-	        rowNode.push(board[row].map(function (tick, column) {
+	        rowNode.push(state.board[row].map(function (tick, column) {
 	          return _react2.default.createElement(
 	            'td',
-	            { key: [column, row],
-	              'data-key': [column, row],
-	              onClick: _this2.tickBox.bind(_this2, board),
+	            { key: [row, column],
+	              'data-key': [row, column],
+	              onClick: _this2.tickBox.bind(_this2, state),
 	              className: 'tick' },
-	            (row, column)
+	            _react2.default.createElement(_TickBox2.default, { tick: tick })
 	          );
 	        }));
 	      };
 
-	      for (var row in board) {
+	      for (var row in state.board) {
 	        _loop(row);
 	      }
 	      rowNode.forEach(function (row, index) {
@@ -19804,7 +19809,7 @@
 	      });
 	      return _react2.default.createElement(
 	        'table',
-	        null,
+	        { className: 'tic-tac-toe-board' },
 	        _react2.default.createElement(
 	          'tbody',
 	          null,
@@ -19817,8 +19822,17 @@
 	    value: function render() {
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'grid' },
-	        this.createBoardComponents(this.state.board)
+	        { className: 'grid-wrapper' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'grid' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'overlay' },
+	            this.state.win
+	          ),
+	          this.createBoardComponents(this.state)
+	        )
 	      );
 	    }
 	  }]);
@@ -19841,10 +19855,7 @@
 
 	var _core = __webpack_require__(161);
 
-	function reducer() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? _core.INITIAL_STATE : arguments[0];
-	  var action = arguments[1];
-
+	function reducer(state, action) {
 	  switch (action.type) {
 	    case 'CREATE_BOARD':
 	      return (0, _core.createBoard)(action.size);
@@ -19866,7 +19877,7 @@
 /* 161 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -19877,13 +19888,42 @@
 	exports.checkRow = checkRow;
 	exports.checkDiagonalRight = checkDiagonalRight;
 	exports.checkDiagonalLeft = checkDiagonalLeft;
+	// TODO: ALTERNATE BETWEEN X AND O in add tick
+
+	function alternateTicks(tick) {
+	  if (tick === 'x') {
+	    return 'o';
+	  } else {
+	    return 'x';
+	  }
+	}
+
 	function addTick(state, input) {
-	  var newState = state;
-	  newState[input[1]][input[0]] = input[2];
-	  return newState;
+	  if (state.board[input[0]][input[1]] === undefined) {
+	    var newState = state;
+	    var tick = alternateTicks(state.lastTick.tick);
+	    newState.board[input[0]][input[1]] = tick;
+	    newState.lastTick = {
+	      yAxis: input[0],
+	      xAxis: input[1],
+	      tick: tick,
+	      numberOfTicks: state.lastTick.numberOfTicks + 1
+	    };
+	    return newState;
+	  } else {
+	    return state;
+	  }
 	}
 
 	function createBoard(n) {
+	  var state = {
+	    lastTick: {
+	      xAxis: undefined,
+	      yAxis: undefined,
+	      tick: undefined,
+	      numberOfTicks: 0
+	    }
+	  };
 	  var board = {};
 	  for (var i = 0; i < n; i++) {
 	    var row = [];
@@ -19892,70 +19932,126 @@
 	    }
 	    board[i] = row;
 	  }
-	  return board;
+	  state.board = board;
+	  return state;
 	}
 
 	function checkColumn(state, column, tick) {
-	  var flag = true;
-	  if (flag) {
-	    for (var i in state) {
-	      if (state[i][column] !== tick) {
-	        return false;
+	  if (state === true) {
+	    return true;
+	  } else {
+	    for (var i in state.board) {
+	      if (state.board[i][column] !== tick) {
+	        return state;
 	      }
 	    }
+	    return true;
 	  }
-	  return flag;
 	}
 
 	function checkRow(state, row, tick) {
-	  var flag = true;
-	  if (flag) {
-	    for (var i = 0; i < state[row]; i++) {
-	      if (state[row][i] !== tick) {
-	        return false;
+	  if (state === true) {
+	    return true;
+	  } else {
+	    for (var i = 0; i < state.board[row].length; i++) {
+	      if (state.board[row][i] !== tick) {
+	        return state;
 	      }
 	    }
+	    return true;
 	  }
-	  return flag;
 	}
 
 	function checkDiagonalRight(state, tick) {
-	  var flag = true;
-	  var position = 0;
-	  for (var i in state) {
-	    if (state[i][position] !== tick) {
-	      return false;
+	  if (state === true) {
+	    return true;
+	  } else {
+	    var position = 0;
+	    for (var i in state.board) {
+	      if (state.board[i][position] !== tick) {
+	        return state;
+	      }
+	      position++;
 	    }
-	    position++;
+	    return true;
 	  }
-	  return flag;
 	}
 
 	function checkDiagonalLeft(state, tick) {
-	  var flag = true;
-	  var position = state[0].length - 1;
-	  for (var i in state) {
-	    if (state[i][position] !== tick) {
-	      return false;
+	  if (state === true) {
+	    return true;
+	  } else {
+	    var position = state.board[0].length - 1;
+	    for (var i in state.board) {
+	      if (state.board[i][position] !== tick) {
+	        return state;
+	      }
+	      position--;
 	    }
-	    position--;
+	    return true;
 	  }
-	  return flag;
 	}
-
-	var INITIAL_STATE = exports.INITIAL_STATE = createBoard(3);
 
 /***/ },
 /* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TickBox = function (_React$Component) {
+	  _inherits(TickBox, _React$Component);
+
+	  function TickBox(props) {
+	    _classCallCheck(this, TickBox);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(TickBox).call(this, props));
+	  }
+
+	  _createClass(TickBox, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'inner-tick' },
+	        this.props.tick
+	      );
+	    }
+	  }]);
+
+	  return TickBox;
+	}(_react2.default.Component);
+
+	exports.default = TickBox;
+
+/***/ },
+/* 163 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(163);
+	var content = __webpack_require__(164);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(165)(content, {});
+	var update = __webpack_require__(166)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -19972,21 +20068,21 @@
 	}
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(164)();
+	exports = module.exports = __webpack_require__(165)();
 	// imports
 
 
 	// module
-	exports.push([module.id, ".grid .tick {\n  border: 1px solid black;\n  width: 200px;\n  height: 200px; }\n", ""]);
+	exports.push([module.id, "body {\n  background-color: black; }\n\nbody {\n  font-family: 'Quicksand', sans-serif; }\n\n.grid-wrapper .tic-tac-toe-board {\n  width: 700px;\n  margin: 0 auto; }\n\n.grid-wrapper .tick {\n  width: auto;\n  position: relative; }\n\n.grid-wrapper .tick:after {\n  content: '';\n  display: block;\n  margin-top: 100%; }\n\n.grid-wrapper .tick {\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  border: 1px solid black;\n  position: relative; }\n\n.grid-wrapper .inner-tick {\n  margin: auto;\n  position: absolute; }\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports) {
 
 	/*
@@ -20042,7 +20138,7 @@
 
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*

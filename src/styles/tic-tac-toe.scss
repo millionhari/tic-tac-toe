@@ -1,8 +1,80 @@
-.grid {
-  $size: 200px;
+@import 'grid';
+$eventbrite-orange: #ff8000;
+$tick: white;
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.win-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 10;
+  margin: 0 auto;
+  .win-overlay-inner {
+    text-align: center;
+    position: relative;
+    margin-top: 20%;
+    font-size: 60px;;
+  }
+}
+
+.grid-wrapper {
+  .grid {
+    padding-top: 20px;
+  }
+  .tic-tac-toe-board {
+    @include viewports(xlarge) {
+      width: 1200px;
+    }
+    @include viewports(large) {
+      width: 700px;
+    }
+    @include viewports(medium) {
+      width: 600px;
+    }
+    @include viewports(small) {
+      width: 70%;
+    }
+    margin: 0 auto;
+    margin: 0 auto;
+  }
   .tick {
-    border: 1px solid black;
-    width: $size;
-    height: $size;
+    width: auto;
+    position: relative;
+    margin: 20px auto;
+  }
+  .tick:after {
+    content: '';
+    display: block;
+    margin-top: 100%;
+  }
+  .tick {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border: 0;
+    background-color: $eventbrite-orange;
+    border-radius: 20px;
+    position: relative;
+  }
+
+  .inner-tick {
+    color: $tick;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 45%;
+    transform: translateY(-50%);
+    text-align: center;
+    font-weight: bold;
+    font-size: 100px;
   }
 }

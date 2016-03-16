@@ -16,7 +16,8 @@ export function addTick(state, input){
     newState.lastTick = {
       yAxis: input[0],
       xAxis: input[1],
-      tick: tick
+      tick: tick,
+      numberOfTicks: state.lastTick.numberOfTicks+1
     };
     return newState;
   } else {
@@ -29,7 +30,8 @@ export function createBoard(n) {
     lastTick: {
       xAxis: undefined,
       yAxis: undefined,
-      tick: undefined
+      tick: undefined,
+      numberOfTicks: 0
     }
   };
   let board = {};
