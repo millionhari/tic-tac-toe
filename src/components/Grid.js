@@ -1,14 +1,15 @@
 import React from 'react';
 import reducer from '../reducer';
 import TickBox from './TickBox';
-import WinScreen from './WinScreen';
-import TieScreen from './TieScreen';
+import WinBox from './WinBox';
 
 class Grid extends React.Component {
   constructor(props) {
     super(props);
-    this.state = this.createBoardData(3);
+    let nGrid = prompt('how many grids?');
+    this.state = this.createBoardData(nGrid);
   }
+
   createBoardData(size) {
     const initialState = {};
     const action = {type: 'CREATE_BOARD', size: size};
@@ -17,11 +18,11 @@ class Grid extends React.Component {
   }
 
   restartState() {
-    const freshState = this.createBoardData(3);
+    const freshState = this.createBoardData(this.state.board[0].length);
     this.setState(freshState);
   }
 
-  componentWillUpdate(prevProps, state) {
+  checkWin(state) {
     const actions = [
       {type: 'CHECK_COLUMN', column:state.lastTick.xAxis, tick: state.lastTick.tick},
       {type: 'CHECK_ROW', row:state.lastTick.yAxis, tick: state.lastTick.tick},
@@ -30,12 +31,16 @@ class Grid extends React.Component {
     ];
     let win = actions.reduce(reducer, state);
     if (win === true){
-      state.win = <WinScreen winState={win} winner={state.lastTick.tick} restartState={this.restartState.bind(this)}/>
+      state.winner = state.lastTick.tick;
       return;
     }
     if (state.lastTick.numberOfTicks === Math.pow(state.board[0].length,2)){
-      state.win = <TieScreen restartState={this.restartState.bind(this)}/>
+      state.winner = 'tie';
     }
+  }
+
+  componentWillUpdate(prevProps, state) {
+    this.checkWin(state);
   }
 
   _stringToArrayOfInt(coordinates) {
@@ -68,12 +73,12 @@ class Grid extends React.Component {
   render() {
     return (
       <div>
-        {this.state.win}
         <div className='grid-wrapper'>
           <div className='grid'>
               {this.createBoardComponents(this.state)}
           </div>
         </div>
+        <WinBox restart={this.restartState.bind(this)} winner={this.state.winner}/>
       </div>
     );
   }
